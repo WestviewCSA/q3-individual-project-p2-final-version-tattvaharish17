@@ -1,3 +1,36 @@
 Questions:
 
 Write as many questions as you can based on the project specs.
+
+Are we allowed to ue any AI at all?[o]
+
+are we allowed to go through every spot on tyhe maze until we find it or does it have to be optimized?[C]
+
+Are the position of starting wolverine and the wolverine buck randomized in ach maze?[C]
+
+Do the dimensuion of each maze change within a limited spectrum in a random order?[C]
+
+When is this due?[C]
+
+What is the werigthing of thi assignment in the gradebook?[C]
+
+Will we be provided tarter code or will we get some initially to work with?[O]
+
+Can we collaborate with peers on thi or is this completely individual?[C]
+
+Will this be all class work?[C]
+
+Will we have a ignificant amount of hw on this prohject?[C]
+
+What is a viable runtime for the program?[O]
+
+How serious is runtime in the overall grade?[O]
+
+What exactly does the design plan entail?[O]
+
+Is the design plan based on a strict rubric or i there more leeway with how we can interpret it?[O]
+
+do we try all three aproachs: stack, queue, and optimal, or only one of them?[C]
+
+
+
