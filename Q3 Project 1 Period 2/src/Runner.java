@@ -1,72 +1,94 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.Scanner;
 
 public class Runner {
 
-    // 3D array 
-    private char[][][] mazes;
-    private int rows;
-    private int cols;
-    private int numMazes;
+    public static void main(String[] args) {
 
-    
-    public void readMapFile(String filename) {
+        Queue<String> mazeText = getText("Easy_Map_2");
+
+        while (!mazeText.isEmpty()) {
+            System.out.println(mazeText.poll());
+        }
+
+        System.out.println("");
+
+        String[][] mazeGrid = getCords("Easy_Map_Coordinates");
+
+        for (int r = 0; r < mazeGrid.length; r++) {
+            for (int c = 0; c < mazeGrid[0].length; c++) {
+                System.out.print(mazeGrid[r][c]);
+            }
+            System.out.println();
+        }
+    }
+
+    public static Queue<String> getText(String filename) {
+
+        Queue<String> textBased = new ArrayDeque<>();
+        File fileObj = new File(filename);
+
         try {
-            Scanner sc = new Scanner(new File(filename));
+            Scanner sc = new Scanner(fileObj);
+            int rows     = Integer.parseInt(sc.next());
+            int cols     = Integer.parseInt(sc.next());
+            int numMazes = Integer.parseInt(sc.next());
 
-            rows     = sc.nextInt();
-            cols     = sc.nextInt();
-            numMazes = sc.nextInt();
-            sc.nextLine(); 
+            while (sc.hasNext()) {
+                String temp = sc.next();
 
-            // Create  3D array 
-            mazes = new char[numMazes][rows][cols];
+                if (!temp.matches("[.$W@]+")) {
+                    System.out.println("There is an invalid character");
+                    return new ArrayDeque<>();
+                } else {
+                    textBased.add(temp);
+                }
+            }
 
-            // Loop through each maze, row, and character
-            for (int m = 0; m < numMazes; m++) {
-                for (int r = 0; r < rows; r++) {
-                    String line = sc.nextLine();
-                    for (int c = 0; c < cols && c < line.length(); c++) {
-                        mazes[m][r][c] = line.charAt(c);
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: File not found -> " + filename);
+        }
+
+        return textBased;
+    }
+
+    public static String[][] getCords(String filename) {
+
+        File fileObj = new File(filename);
+
+        try {
+            Scanner sc = new Scanner(fileObj);
+            int rows     = Integer.parseInt(sc.next());
+            int cols     = Integer.parseInt(sc.next());
+            int numMazes = Integer.parseInt(sc.next());
+
+            String[][] mazeGrid = new String[rows][cols];
+
+            while (sc.hasNext()) {
+                String ch  = sc.next();
+                int row    = Integer.parseInt(sc.next());
+                int col    = Integer.parseInt(sc.next());
+                sc.next();
+                mazeGrid[row][col] = ch;
+            }
+
+            for (int r = 0; r < mazeGrid.length; r++) {
+                for (int c = 0; c < mazeGrid[0].length; c++) {
+                    if (mazeGrid[r][c] == null) {
+                        mazeGrid[r][c] = ".";
                     }
                 }
             }
 
-            sc.close();
+            return mazeGrid;
 
         } catch (FileNotFoundException e) {
             System.out.println("Error: File not found -> " + filename);
         }
-    }
 
-    public void readCoordinateFile(String filename) {
-        try {
-            Scanner sc = new Scanner(new File(filename));
-
-            rows     = sc.nextInt();
-            cols     = sc.nextInt();
-            numMazes = sc.nextInt();
-
-          
-            mazes = new char[numMazes][rows][cols];
-            for (int m = 0; m < numMazes; m++)
-                for (int r = 0; r < rows; r++)
-                    for (int c = 0; c < cols; c++)
-                        mazes[m][r][c] = '.';
-
-            while (sc.hasNext()) {
-                char ch      = sc.next().charAt(0);
-                int  row     = sc.nextInt();
-                int  col     = sc.nextInt();
-                int  mazeIdx = sc.nextInt();
-                mazes[mazeIdx][row][col] = ch;
-            }
-
-            sc.close();
-
-        } catch (FileNotFoundException e) {
-            System.out.println("Error: File not found -> " + filename);
-        }
+        return null;
     }
 }
