@@ -10,7 +10,7 @@ public class Runner{
 
 	 public static void main(String[] args) {
 
-	        String[][][] maze = getText1("easymaze1");
+	        String[][][] maze = getText("easymaze1");
 
 	        for(int lvl = 0; lvl < maze.length; lvl++) {
 	            for(int r = 0; r < maze[lvl].length; r++) {
@@ -34,32 +34,32 @@ public class Runner{
 
 	    }
     
-    public static String[][][] getText1(String filename) {
+    public static String[][][] getText(String filename) {
 
         File fileObj = new File(filename);
 
         try {
             Scanner sc = new Scanner(fileObj);
 
-            int rows = Integer.parseInt(sc.next());
-            int cols = Integer.parseInt(sc.next());
-            int numMazes = Integer.parseInt(sc.next());
-            String[][][] maze1 = new String[numMazes][rows][cols];
+            int r = Integer.parseInt(sc.next());
+            int c = Integer.parseInt(sc.next());
+            int nm = Integer.parseInt(sc.next());
+            String[][][] maze1 = new String[nm][r][c];
 
-            int currentRow = 0;
-            int currentLevel = 0;
+            int currrow = 0;
+            int currlvl = 0;
             while (sc.hasNext()) {
                 String line = sc.next();
                 
                 for (int col = 0; col < line.length(); col++) {
-                    maze1[currentLevel][currentRow][col] = String.valueOf(line.charAt(col));
+                    maze1[currlvl][currrow][col] = String.valueOf(line.charAt(col));
                 }
 
-                currentRow++;
+                currrow++;
 
-                if (currentRow == rows) {
-                    currentRow = 0;
-                    currentLevel++;
+                if (currrow == r) {
+                    currrow = 0;
+                    currlvl++;
                 }
             }
 
@@ -72,7 +72,7 @@ public class Runner{
     }
 
 
-    public static String[][] getCords(String filename) {
+    public static String[][][] getCords(String filename) {
 
         File fileObj = new File(filename);
 
@@ -80,27 +80,37 @@ public class Runner{
             Scanner sc = new Scanner(fileObj);
             int rows     = Integer.parseInt(sc.next());
             int cols     = Integer.parseInt(sc.next());
-            int numMazes = Integer.parseInt(sc.next());
+            int nummazes = Integer.parseInt(sc.next());
 
-            String[][] mazeGrid = new String[rows][cols];
+            String[][][] mazeGrid = new String[nummazes][rows][cols];
 
             while (sc.hasNext()) {
                 String ch  = sc.next();
                 int row    = Integer.parseInt(sc.next());
                 int col    = Integer.parseInt(sc.next());
-                sc.next();
-                mazeGrid[row][col] = ch;
-            }
-
-            for (int r = 0; r < mazeGrid.length; r++) {
-                for (int c = 0; c < mazeGrid[0].length; c++) {
-                    if (mazeGrid[r][c] == null) {
-                        mazeGrid[r][c] = ".";
-                    }
+                int level = Integer.parseInt(sc.next());
+                if (row >= rows || col >= cols || level >= nummazes) {
+                    System.out.println("Coordinates don't match the given specs");
+                    return new String[0][0][0];
                 }
+                mazeGrid[level][row][col] = ch;
+
+            }
+            
+
+            for (int level = 0; level < mazeGrid.length; level++) {
+            	for (int row = 0; row < mazeGrid[0].length; row++) {
+            		for (int col = 0; col < mazeGrid[0][0].length; col++) {
+            			if (mazeGrid[level][row][col] == null) {
+                            mazeGrid[level][row][col] = ".";
+            		}
+            	}
+            }
             }
 
             return mazeGrid;
+            
+            
 
         } catch (FileNotFoundException e) {
             System.out.println("Error: File not found -> " + filename);
