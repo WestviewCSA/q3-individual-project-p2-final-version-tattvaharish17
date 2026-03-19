@@ -8,48 +8,31 @@ import java.util.Scanner;
 public class Runner{
 
 
-public static void main(String[] args) {
-    
-    String[][][] maze = getText1("src/easymaze1");
-    for(int level = 0; level < maze.length; level++) {
-        for(int i = 0; i < maze[level].length; i++) {
-            for(int j = 0; j < maze[level][0].length; j++) {
-                System.out.print(maze[level][i][j]);
-            }
-            System.out.println();
-        }
-    }
-}
-    
+	 public static void main(String[] args) {
 
-    public static Queue<String> getText(String filename) {
+	        String[][][] maze = getText1("easymaze1");
 
-        Queue<String> textBased = new ArrayDeque<>();
-        File fileObj = new File(filename);
+	        for(int lvl = 0; lvl < maze.length; lvl++) {
+	            for(int r = 0; r < maze[lvl].length; r++) {
+	                for(int c = 0; c < maze[lvl][0].length; c++) {
+	                    System.out.print(maze[lvl][r][c]);
+	                }
+	                System.out.println();
+	            }
+	        }
 
-        try {
-            Scanner sc = new Scanner(fileObj);
-            int rows     = Integer.parseInt(sc.next());
-            int cols     = Integer.parseInt(sc.next());
-            int numMazes = Integer.parseInt(sc.next());
+	        Queue<int[]> qv = queueSearch(maze);
+	        while(!qv.isEmpty()) {
+	        	int[] pos = qv.poll();
+	        	System.out.println(pos[0] + " "+ pos[1]+ " "+ pos[2]);
+	        }
+	        Queue<int[]> sv = stackSearch(maze);
+	        while(!sv.isEmpty()) {
+	        	int[] pos = sv.poll();
+	        	System.out.println(pos[0] + " "+ pos[1]+ " "+ pos[2]);
+	        }
 
-            while (sc.hasNext()) {
-                String temp = sc.next();
-
-                if (!temp.matches("[.$W@]+")) {
-                    System.out.println("There is an invalid character");
-                    return new ArrayDeque<>();
-                } else {
-                    textBased.add(temp);
-                }
-            }
-
-        } catch (FileNotFoundException e) {
-            System.out.println("Error: File not found -> " + filename);
-        }
-
-        return textBased;
-    }
+	    }
     
     public static String[][][] getText1(String filename) {
 
