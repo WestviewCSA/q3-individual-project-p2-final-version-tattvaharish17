@@ -118,4 +118,82 @@ public class Runner{
 
         return null;
     }
-}
+    public static boolean isOpen(String cell) {
+        return cell.equals(".") || cell.equals("$") || cell.equals("|");
+    }
+    public static Queue<int[]> queueSearch(String[][][] maze){
+    	Queue<int[]> toVisit = new ArrayDeque<>();
+        Queue<int[]> alrvisited = new ArrayDeque<>();
+        
+        boolean[][][] seen = new boolean[maze.length][maze[0].length][maze[0][0].length];
+        int[] start = new int[3];
+        for (int row = 0; row < maze[0].length; row++) {
+            for (int col = 0; col < maze[0][0].length; col++) {
+                if (maze[0][row][col].equals("W")) {
+                    start[0] = row;
+                    start[1] = col;
+                    start[2] = 0;
+                }
+            }
+        }
+        toVisit.add(start);
+        seen[start[2]][start[0]][start[1]] = true;
+
+        int[][] moves = {
+            {-1, 0},   // north
+            {1, 0},    // south
+            {0, 1},    // east
+            {0, -1}    // west
+        };
+        
+        while (!toVisit.isEmpty()) {
+        	int[] current = toVisit.poll();
+
+            int row = current[0];
+            int col = current[1];
+            int level = current[2];
+
+            if (!maze[level][row][col].equals("W")) {
+                alrvisited.add(current);
+            }
+
+            if (maze[level][row][col].equals("|")) {
+                int nextLevel = level + 1;
+
+                for (int r = 0; r < maze[nextLevel].length; r++) {
+                    for (int c = 0; c < maze[nextLevel][0].length; c++) {
+                        if (maze[nextLevel][r][c].equals("W") && !seen[nextLevel][r][c]) {
+                            toVisit.add(new int[]{r, c, nextLevel});
+                            seen[nextLevel][r][c] = true;
+                        }
+                    }
+                }
+                continue;
+            }
+            for (int i = 0; i < moves.length; i++) {
+                int newRow = row + moves[i][0];
+                int newCol = col + moves[i][1];
+
+                if (newRow >= 0 && newRow < maze[level].length &&
+                    newCol >= 0 && newCol < maze[level][0].length &&
+                    !seen[level][newRow][newCol]) {
+
+                    if (isOpen(maze[level][newRow][newCol])) {
+                        toVisit.add(new int[]{newRow, newCol, level});
+                        seen[level][newRow][newCol] = true;
+
+                        if (maze[level][newRow][newCol].equals("$")) {
+                            return alrvisited;
+                        }
+                    }
+                }
+            }
+        }
+
+        return alrvisited;
+    }
+
+       
+    }
+  
+
