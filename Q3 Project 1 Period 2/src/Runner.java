@@ -192,6 +192,27 @@ public class Runner{
 
         return alrvisited;
     }
+    
+    public static Queue<int[]> stackSearch(String[][][] maze) {
+
+        Stack<int[]> toVisit = new Stack<>();
+        Queue<int[]> alrvisited = new ArrayDeque<>();
+
+        boolean[][][] seen = new boolean[maze.length][maze[0].length][maze[0][0].length];
+
+        int[] start = new int[3];
+
+        for (int row = 0; row < maze[0].length; row++) {
+            for (int col = 0; col < maze[0][0].length; col++) {
+                if (maze[0][row][col].equals("W")) {
+                    start[0] = row;
+                    start[1] = col;
+                    start[2] = 0;
+                }
+            }
+        }
+    }
+
 
        
     }
