@@ -134,10 +134,21 @@ public class Runner{
         return cell.equals(".") || cell.equals("$") || cell.equals("|");
     }
     public static Queue<int[]> queueSearch(String[][][] maze){
-    	Queue<int[]> toVisit = new ArrayDeque<>();
-        Queue<int[]> alrvisited = new ArrayDeque<>();
-        
+    	Queue<int[]> toVisit = new ArrayDeque<>();        
         boolean[][][] seen = new boolean[maze.length][maze[0].length][maze[0][0].length];
+        
+        int[][][][] parent = new int[maze.length][maze[0].length][maze[0][0].length][3];
+        
+        for (int level = 0; level < maze.length; level++) {
+            for (int row = 0; row < maze[0].length; row++) {
+                for (int col = 0; col < maze[0][0].length; col++) {
+                    parent[level][row][col][0] = -1;
+                    parent[level][row][col][1] = -1;
+                    parent[level][row][col][2] = -1;
+                }
+            }
+        }
+        
         int[] start = new int[3];
         for (int row = 0; row < maze[0].length; row++) {
             for (int col = 0; col < maze[0][0].length; col++) {
@@ -164,10 +175,11 @@ public class Runner{
             int row = current[0];
             int col = current[1];
             int level = current[2];
-
-            if (!maze[level][row][col].equals("W")) {
-                alrvisited.add(current);
+            
+            if (maze[level][row][col].equals("$")) {
+                return buildPath(parent, row, col, level);
             }
+            
 
             if (maze[level][row][col].equals("|")) {
                 int nextLevel = level + 1;
@@ -177,6 +189,10 @@ public class Runner{
                         if (maze[nextLevel][r][c].equals("W") && !seen[nextLevel][r][c]) {
                             toVisit.add(new int[]{r, c, nextLevel});
                             seen[nextLevel][r][c] = true;
+
+                            parent[nextLevel][r][c][0] = row;
+                            parent[nextLevel][r][c][1] = col;
+                            parent[nextLevel][r][c][2] = level;
                         }
                     }
                 }
@@ -194,16 +210,15 @@ public class Runner{
                     	toVisit.add(new int[]{newRow, newCol, level});
                     	seen[level][newRow][newCol] = true;
 
-                    	if (maze[level][newRow][newCol].equals("$")) {
-                    	    alrvisited.add(new int[]{newRow, newCol, level});
-                    	    return alrvisited;
-                    	}
+                    	parent[level][newRow][newCol][0] = row;
+                        parent[level][newRow][newCol][1] = col;
+                        parent[level][newRow][newCol][2] = level;
                     }
                 }
             }
         }
 
-        return alrvisited;
+        return new ArrayDeque<>();
     }
     
     public static Queue<int[]> stackSearch(String[][][] maze) {
