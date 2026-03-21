@@ -284,6 +284,34 @@ public class Runner{
 
        
     }
+    
+    public static Queue<int[]> buildPath(int[][][][] parent, int endRow, int endCol, int endLevel) {
+
+        Stack<int[]> backwards = new Stack<>();
+        Queue<int[]> path = new ArrayDeque<>();
+
+        int row = endRow;
+        int col = endCol;
+        int level = endLevel;
+
+        while (row != -1) {
+            backwards.push(new int[]{row, col, level});
+
+            int nextRow = parent[level][row][col][0];
+            int nextCol = parent[level][row][col][1];
+            int nextLevel = parent[level][row][col][2];
+
+            row = nextRow;
+            col = nextCol;
+            level = nextLevel;
+        }
+
+        while (!backwards.isEmpty()) {
+            path.add(backwards.pop());
+        }
+
+        return path;
+    }
 }
 
   
