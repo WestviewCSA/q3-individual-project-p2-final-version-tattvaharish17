@@ -327,6 +327,24 @@ public class Runner{
 
         return path;
     }
+    
+    public static void markPath(String[][][] maze, Queue<int[]> path) {
+
+        while (!path.isEmpty()) {
+            int[] pos = path.poll();
+
+            int row = pos[0];
+            int col = pos[1];
+            int level = pos[2];
+
+            if (!maze[level][row][col].equals("W") &&
+                !maze[level][row][col].equals("$")) {
+
+                maze[level][row][col] = "+";
+            }
+        }
+    }
+    
 }
 
   
