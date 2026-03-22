@@ -66,8 +66,21 @@ public class Runner{
 	        fileName = input.nextLine();
 	    }
 
-	    String[][][] maze = getText(fileName);
+	    System.out.print("Input format (text/coordinate): ");
+	    String inputType = input.nextLine();
 
+	    String[][][] maze;
+
+	    if (inputType.equalsIgnoreCase("text")) {
+	        maze = getText(fileName);
+	    }
+	    else if (inputType.equalsIgnoreCase("coordinate")) {
+	        maze = getCords(fileName);
+	    }
+	    else {
+	        System.out.println("Invalid input format.");
+	        return;
+	    }
 	    long startTime = 0;
 	    long endTime = 0;
 
@@ -431,6 +444,8 @@ public class Runner{
 
         }
     }
+    
+
     
 }
 
