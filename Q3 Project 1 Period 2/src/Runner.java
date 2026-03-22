@@ -25,13 +25,11 @@ public class Runner{
 	            }
 	        }
 
-	        System.out.println("Queue Search:");
+	        System.out.println("Queue Path:");
 
 	        Queue<int[]> visited = queueSearch(maze);
-	        while(!visited.isEmpty()) {
-	            int[] pos = visited.poll();
-	            System.out.println(pos[0] + " " + pos[1] + " " + pos[2]);
-	        }
+	        markPath(maze, visited);
+	        displayGrid(maze);
 
 	        System.out.println();
 
@@ -342,6 +340,22 @@ public class Runner{
 
                 maze[level][row][col] = "+";
             }
+        }
+    }
+    
+    public static void displayGrid(String[][][] maze) {
+
+        for (int level = 0; level < maze.length; level++) {
+
+            for (int row = 0; row < maze[level].length; row++) {
+
+                for (int col = 0; col < maze[level][0].length; col++) {
+                    System.out.print(maze[level][row][col]);
+                }
+
+                System.out.println();
+            }
+
         }
     }
     
