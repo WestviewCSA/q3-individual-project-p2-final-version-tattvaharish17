@@ -8,41 +8,100 @@ import java.util.Scanner;
 public class Runner{
 
 
-	 public static void main(String[] args) {
+	public static void main(String[] args) {
 
-			    Scanner input = new Scanner(System.in);
+	    Scanner input = new Scanner(System.in);
 
-			    System.out.print("Enter maze file name: ");
-			    String fileName = input.next();
+	    boolean useQueue = false;
+	    boolean useStack = false;
+	    boolean showTime = false;
 
-			    String[][][] maze = getText(fileName);
-	        for(int lvl = 0; lvl < maze.length; lvl++) {
-	            for(int r = 0; r < maze[lvl].length; r++) {
-	                for(int c = 0; c < maze[lvl][0].length; c++) {
-	                    System.out.print(maze[lvl][r][c]);
-	                }
-	                System.out.println();
+	    String fileName;
+
+	    if (args.length > 0) {
+
+	        for (int i = 0; i < args.length - 1; i++) {
+	            if (args[i].equals("--Queue")) {
+	                useQueue = true;
+	            }
+	            else if (args[i].equals("--Stack")) {
+	                useStack = true;
+	            }
+	            else if (args[i].equals("--Time")) {
+	                showTime = true;
 	            }
 	        }
 
-	        System.out.println("Queue Path:");
+	        if ((useQueue && useStack) || (!useQueue && !useStack)) {
+	            System.out.println("Use exactly one of --Queue or --Stack.");
+	            System.exit(-1);
+	        }
 
-	        Queue<int[]> visited = queueSearch(maze);
-	        markPath(maze, visited);
-	        displayGrid(maze);
+	        fileName = args[args.length - 1];
 
-	        System.out.println();
+	    } else {
 
-	        System.out.println("Stack Path:");
+	        System.out.print("Choose mode (queue/stack): ");
+	        String mode = input.nextLine();
 
-	        String[][][] maze2 = getText(fileName);
+	        if (mode.equalsIgnoreCase("queue")) {
+	            useQueue = true;
+	        }
+	        else if (mode.equalsIgnoreCase("stack")) {
+	            useStack = true;
+	        }
+	        else {
+	            System.out.println("Use queue or stack.");
+	            System.exit(-1);
+	        }
 
-	        Queue<int[]> stackPath = stackSearch(maze2);
+	        System.out.print("Show runtime? (yes/no): ");
+	        String timeChoice = input.nextLine();
 
-	        markPath(maze2, stackPath);
+	        if (timeChoice.equalsIgnoreCase("yes")) {
+	            showTime = true;
+	        }
 
-	        displayGrid(maze2);
+	        System.out.print("Enter maze file name: ");
+	        fileName = input.nextLine();
 	    }
+
+	    String[][][] maze = getText(fileName);
+
+	    long startTime = 0;
+	    long endTime = 0;
+
+	    Queue<int[]> path;
+
+	    if (showTime) {
+	        startTime = System.nanoTime();
+	    }
+
+	    if (useQueue) {
+	        path = queueSearch(maze);
+	    } else {
+	        path = stackSearch(maze);
+	    }
+
+	    if (showTime) {
+	        endTime = System.nanoTime();
+	    }
+
+	    markPath(maze, path);
+
+	    if (useQueue) {
+	        System.out.println("Queue Path:");
+	    } else {
+	        System.out.println("Stack Path:");
+	    }
+
+	    displayGrid(maze);
+
+	    if (showTime) {
+	        double totalSeconds = (endTime - startTime) / 1000000000.0;
+	        System.out.println("Total Runtime: " + totalSeconds + " seconds");
+	    }
+	}
     
     public static String[][][] getText(String filename) {
 
