@@ -33,15 +33,15 @@ public class Runner{
 
 	        System.out.println();
 
-	        System.out.println("Stack Search:");
+	        System.out.println("Stack Path:");
 
-	        Queue<int[]> visitedStack = stackSearch(maze);
-	        while(!visitedStack.isEmpty()) {
-	            int[] pos = visitedStack.poll();
-	            System.out.println(pos[0] + " " + pos[1] + " " + pos[2]);
-	        }
+	        String[][][] maze2 = getText(fileName);
 
-	        System.out.println();
+	        Queue<int[]> stackPath = stackSearch(maze2);
+
+	        markPath(maze2, stackPath);
+
+	        displayGrid(maze2);
 	    }
     
     public static String[][][] getText(String filename) {
@@ -222,9 +222,19 @@ public class Runner{
     public static Queue<int[]> stackSearch(String[][][] maze) {
 
         Stack<int[]> toVisit = new Stack<>();
-        Queue<int[]> alrvisited = new ArrayDeque<>();
 
         boolean[][][] seen = new boolean[maze.length][maze[0].length][maze[0][0].length];
+        int[][][][] parent = new int[maze.length][maze[0].length][maze[0][0].length][3];
+        
+        for (int lvl = 0; lvl < maze.length; lvl++) {
+            for (int r = 0; r < maze[0].length; r++) {
+                for (int c = 0; c < maze[0][0].length; c++) {
+                    parent[lvl][r][c][0] = -1;
+                    parent[lvl][r][c][1] = -1;
+                    parent[lvl][r][c][2] = -1;
+                }
+            }
+        }
 
         int[] start = new int[3];
 
@@ -254,18 +264,23 @@ public class Runner{
             int row = current[0];
             int col = current[1];
             int level = current[2];
-            if (!maze[level][row][col].equals("W")) {
-                alrvisited.add(current);
+            if (maze[level][row][col].equals("$")) {
+                return buildPath(parent, row, col, level);
             }
+            
             if (maze[level][row][col].equals("|")) {
                 int nextLevel = level + 1;
                 for (int r = 0; r < maze[nextLevel].length; r++) {
                     for (int c = 0; c < maze[nextLevel][0].length; c++) {
-                        if (maze[nextLevel][r][c].equals("W") && !seen[nextLevel][r][c]) {
-                            toVisit.push(new int[]{r, c, nextLevel});
-                            seen[nextLevel][r][c] = true;
-                        }
-                    }
+                    	if (maze[nextLevel][r][c].equals("W") && !seen[nextLevel][r][c]) {
+                    	    toVisit.push(new int[]{r, c, nextLevel});
+                    	    seen[nextLevel][r][c] = true;
+
+                    	    parent[nextLevel][r][c][0] = row;
+                    	    parent[nextLevel][r][c][1] = col;
+                    	    parent[nextLevel][r][c][2] = level;
+                    	}
+                    	}
                 }
                 continue;
                }
@@ -277,21 +292,19 @@ public class Runner{
                     newCol >= 0 && newCol < maze[level][0].length &&
                     !seen[level][newRow][newCol]) {
 
-                    if (isOpen(maze[level][newRow][newCol])) {
-                        toVisit.push(new int[]{newRow, newCol, level});
-                        seen[level][newRow][newCol] = true;
+                	if (isOpen(maze[level][newRow][newCol])) {
+                	    toVisit.push(new int[]{newRow, newCol, level});
+                	    seen[level][newRow][newCol] = true;
 
-                        if (maze[level][newRow][newCol].equals("$")) {
-                            alrvisited.add(new int[]{newRow, newCol, level});
-                            return alrvisited;
-                        }
-                    }
+                	    parent[level][newRow][newCol][0] = row;
+                	    parent[level][newRow][newCol][1] = col;
+                	    parent[level][newRow][newCol][2] = level;
+                	}
                 }
             }
         }
 
-        return alrvisited;
-            
+        return new ArrayDeque<>();            
         
 
 
@@ -336,7 +349,8 @@ public class Runner{
             int level = pos[2];
 
             if (!maze[level][row][col].equals("W") &&
-                !maze[level][row][col].equals("$")) {
+                !maze[level][row][col].equals("$")
+                !=maze[level][row][col].equals("|")){
 
                 maze[level][row][col] = "+";
             }
