@@ -11,6 +11,8 @@ public class Runner{
 	public static void main(String[] args) {
 
 	    Scanner input = new Scanner(System.in);
+	    
+	    boolean showHelp = false;
 
 	    boolean useQueue = false;
 	    boolean useStack = false;
@@ -30,6 +32,14 @@ public class Runner{
 	            else if (args[i].equals("--Time")) {
 	                showTime = true;
 	            }
+	            else if (args[i].equals("--Help")) {
+	                showHelp = true;
+	            }
+	        }
+	        
+	        if (showHelp) {
+	            printHelp();
+	            System.exit(0);
 	        }
 
 	        if ((useQueue && useStack) || (!useQueue && !useStack)) {
@@ -107,6 +117,11 @@ public class Runner{
 	        System.out.println("Queue Path:");
 	    } else {
 	        System.out.println("Stack Path:");
+	    }
+	    
+	    if (path.isEmpty()) {
+	        System.out.println("The Wolverine Store is closed.");
+	        return;
 	    }
 
 	    if (outputType.equalsIgnoreCase("text")) {
@@ -214,6 +229,8 @@ public class Runner{
     public static boolean isOpen(String cell) {
         return cell.equals(".") || cell.equals("$") || cell.equals("|");
     }
+    
+    
     public static Queue<int[]> queueSearch(String[][][] maze){
     	Queue<int[]> toVisit = new ArrayDeque<>();        
         boolean[][][] seen = new boolean[maze.length][maze[0].length][maze[0][0].length];
@@ -461,6 +478,17 @@ public class Runner{
             int[] pos = path.poll();
             System.out.println(pos[0] + " " + pos[1] + " " + pos[2]);
         }
+    }
+    
+    public static void printHelp() {
+        System.out.println("Overview: program finds viable path if possible from the Wolverine to the WolverineBuck. Using stack, queue, or optimal traversal. ");
+        System.out.println("--Stack : use stack-based traversal (DFS)");
+        System.out.println("--Queue : use queue-based traversal (BFS)");
+        System.out.println("--Opt : use shortest path");
+        System.out.println("--Time : print runtime");
+        System.out.println("--Incoordinate : input is coordinate format");
+        System.out.println("--Outcoordinate : output path as coordinates");
+        System.out.println("--Help : display this message");
     }
     
 
