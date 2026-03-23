@@ -13,7 +13,7 @@ public class Runner{
 	    Scanner input = new Scanner(System.in);
 	    
 	    boolean showHelp = false;
-
+	    boolean useOpt = false;
 	    boolean useQueue = false;
 	    boolean useStack = false;
 	    boolean showTime = false;
@@ -35,6 +35,9 @@ public class Runner{
 	            else if (args[i].equals("--Help")) {
 	                showHelp = true;
 	            }
+	            else if (args[i].equals("--Opt")) {
+	                useOpt = true;
+	            }
 	        }
 	        
 	        if (showHelp) {
@@ -42,8 +45,13 @@ public class Runner{
 	            System.exit(0);
 	        }
 
-	        if ((useQueue && useStack) || (!useQueue && !useStack)) {
-	            System.out.println("Use exactly one of --Queue or --Stack.");
+	        int modeCount = 0;
+	        if (useQueue) modeCount++;
+	        if (useStack) modeCount++;
+	        if (useOpt) modeCount++;
+
+	        if (modeCount != 1) {
+	            System.out.println("Use exactly one of --Queue, --Stack, or --Opt.");
 	            System.exit(-1);
 	        }
 
@@ -51,7 +59,7 @@ public class Runner{
 
 	    } else {
 
-	        System.out.print("Choose mode (queue/stack): ");
+	        System.out.print("Choose mode (queue/stack/opt): ");
 	        String mode = input.nextLine();
 
 	        if (mode.equalsIgnoreCase("queue")) {
@@ -60,6 +68,9 @@ public class Runner{
 	        else if (mode.equalsIgnoreCase("stack")) {
 	            useStack = true;
 	        }
+	        else if (mode.equalsIgnoreCase("opt")) {
+	            useOpt = true;
+	        } 
 	        else {
 	            System.out.println("Use queue or stack.");
 	            System.exit(-1);
@@ -105,8 +116,12 @@ public class Runner{
 
 	    if (useQueue) {
 	        path = queueSearch(maze);
-	    } else {
+	    }
+	    else if (useStack) {
 	        path = stackSearch(maze);
+	    }
+	    else {
+	        path = optSearch(maze);
 	    }
 
 	    if (showTime) {
@@ -115,8 +130,12 @@ public class Runner{
 
 	    if (useQueue) {
 	        System.out.println("Queue Path:");
-	    } else {
+	    }
+	    else if (useStack) {
 	        System.out.println("Stack Path:");
+	    }
+	    else {
+	        System.out.println("Optimal Path:");
 	    }
 	    
 	    if (path.isEmpty()) {
@@ -489,6 +508,183 @@ public class Runner{
         System.out.println("--Incoordinate : input is coordinate format");
         System.out.println("--Outcoordinate : output path as coordinates");
         System.out.println("--Help : display this message");
+        System.out.println("--Opt : use optimal shortest-path search");
+    }
+    
+    public static Queue<int[]> optSearch(String[][][] maze) {
+
+        int levels = maze.length;
+        int rows = maze[0].length;
+        int cols = maze[0][0].length;
+
+        int[][][] steps = new int[levels][rows][cols];
+
+        for (int lvl = 0; lvl < levels; lvl++) {
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < cols; c++) {
+                    steps[lvl][r][c] = -1;
+                }
+            }
+        }
+
+        int startRow = 0;
+        int startCol = 0;
+        int startLevel = 0;
+        int goalRow = -1;
+        int goalCol = -1;
+        int goalLevel = -1;
+
+        // only the FIRST maze's W is the true start
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (maze[0][r][c].equals("W")) {
+                    startRow = r;
+                    startCol = c;
+                    startLevel = 0;
+                }
+            }
+        }
+
+        // goal can be in any level
+        for (int lvl = 0; lvl < levels; lvl++) {
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < cols; c++) {
+                    if (maze[lvl][r][c].equals("$")) {
+                        goalRow = r;
+                        goalCol = c;
+                        goalLevel = lvl;
+                    }
+                }
+            }
+        }
+        
+
+        steps[startLevel][startRow][startCol] = 0;
+
+        int[][] moves = {
+            {-1, 0},
+            {1, 0},
+            {0, 1},
+            {0, -1}
+        };
+
+        boolean changed = true;
+
+        while (changed) {
+            changed = false;
+
+            for (int lvl = 0; lvl < levels; lvl++) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < cols; c++) {
+
+                        if (steps[lvl][r][c] == -1) {
+                            continue;
+                        }
+
+                        int currentStep = steps[lvl][r][c];
+
+                        for (int i = 0; i < moves.length; i++) {
+                            int newRow = r + moves[i][0];
+                            int newCol = c + moves[i][1];
+
+                            if (newRow >= 0 && newRow < rows &&
+                                newCol >= 0 && newCol < cols &&
+                                isOpen(maze[lvl][newRow][newCol]) &&
+                                steps[lvl][newRow][newCol] == -1) {
+
+                                steps[lvl][newRow][newCol] = currentStep + 1;
+                                changed = true;
+                            }
+                        }
+
+                        if (maze[lvl][r][c].equals("|")) {
+                            int nextLevel = lvl + 1;
+
+                            if (nextLevel < levels) {
+                                for (int rr = 0; rr < rows; rr++) {
+                                    for (int cc = 0; cc < cols; cc++) {
+                                        if (maze[nextLevel][rr][cc].equals("W") &&
+                                            steps[nextLevel][rr][cc] == -1) {
+
+                                            steps[nextLevel][rr][cc] = currentStep + 1;
+                                            changed = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (goalLevel != -1 && steps[goalLevel][goalRow][goalCol] != -1) {
+                break;
+            }
+        }
+
+        if (goalLevel == -1 || steps[goalLevel][goalRow][goalCol] == -1) {
+            return new ArrayDeque<>();
+        }
+
+        Stack<int[]> backwards = new Stack<>();
+        Queue<int[]> path = new ArrayDeque<>();
+
+        int row = goalRow;
+        int col = goalCol;
+        int lvl = goalLevel;
+
+        backwards.push(new int[]{row, col, lvl});
+
+        while (!(row == startRow && col == startCol && lvl == startLevel)) {
+            int currentStep = steps[lvl][row][col];
+            boolean foundPrev = false;
+
+            for (int i = 0; i < moves.length; i++) {
+                int newRow = row + moves[i][0];
+                int newCol = col + moves[i][1];
+
+                if (newRow >= 0 && newRow < rows &&
+                    newCol >= 0 && newCol < cols &&
+                    steps[lvl][newRow][newCol] == currentStep - 1) {
+
+                    row = newRow;
+                    col = newCol;
+                    backwards.push(new int[]{row, col, lvl});
+                    foundPrev = true;
+                    break;
+                }
+            }
+
+            if (!foundPrev) {
+                int prevLevel = lvl - 1;
+
+                if (prevLevel >= 0) {
+                    for (int rr = 0; rr < rows && !foundPrev; rr++) {
+                        for (int cc = 0; cc < cols && !foundPrev; cc++) {
+                            if (maze[prevLevel][rr][cc].equals("|") &&
+                                steps[prevLevel][rr][cc] == currentStep - 1) {
+
+                                row = rr;
+                                col = cc;
+                                lvl = prevLevel;
+                                backwards.push(new int[]{row, col, lvl});
+                                foundPrev = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!foundPrev) {
+                return new ArrayDeque<>();
+            }
+        }
+
+        while (!backwards.isEmpty()) {
+            path.add(backwards.pop());
+        }
+
+        return path;
     }
     
 
