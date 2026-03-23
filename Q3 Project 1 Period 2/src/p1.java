@@ -5,159 +5,90 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class Runner{
+public class p1{
 
 
 	public static void main(String[] args) {
+	    try {
+	        boolean useQueue = false;
+	        boolean useStack = false;
+	        boolean useOpt = false;
+	        boolean showTime = false;
+	        boolean inCoordinate = false;
+	        boolean outCoordinate = false;
+	        boolean showHelp = false;
 
-	    Scanner input = new Scanner(System.in);
-	    
-	    boolean showHelp = false;
-	    boolean useOpt = false;
-	    boolean useQueue = false;
-	    boolean useStack = false;
-	    boolean showTime = false;
-
-	    String fileName;
-
-	    if (args.length > 0) {
-
-	        for (int i = 0;i < args.length - 1; i++) {
-	            if (args[i].equals("--Queue")) {
-	                useQueue = true;
-	            }
-	            else if (args[i].equals("--Stack")) {
-	                useStack = true;
-	            }
-	            else if (args[i].equals("--Time")) {
-	                showTime = true;
-	            }
-	            else if (args[i].equals("--Help")) {
-	                showHelp = true;
-	            }
-	            else if (args[i].equals("--Opt")) {
-	                useOpt = true;
-	            }
+	        for (int i = 0; i < args.length - 1; i++) {
+	            if (args[i].equals("--Queue")) useQueue = true;
+	            else if (args[i].equals("--Stack")) useStack = true;
+	            else if (args[i].equals("--Opt")) useOpt = true;
+	            else if (args[i].equals("--Time")) showTime = true;
+	            else if (args[i].equals("--Incoordinate")) inCoordinate = true;
+	            else if (args[i].equals("--Outcoordinate")) outCoordinate = true;
+	            else if (args[i].equals("--Help")) showHelp = true;
 	        }
-	        
+
 	        if (showHelp) {
 	            printHelp();
 	            System.exit(0);
 	        }
 
-	        int modeCount = 0;
-	        if (useQueue) modeCount++;
-	        if (useStack) modeCount++;
-	        if (useOpt) modeCount++;
+	        int count = 0;
+	        if (useQueue) count++;
+	        if (useStack) count++;
+	        if (useOpt) count++;
 
-	        if (modeCount != 1) {
+	        if (count != 1) {
 	            System.out.println("Use exactly one of --Queue, --Stack, or --Opt.");
 	            System.exit(-1);
 	        }
 
-	        fileName = args[args.length - 1];
-
-	    } else {
-
-	        System.out.print("Choose mode (queue/stack/opt): ");
-	        String mode = input.nextLine();
-
-	        if (mode.equalsIgnoreCase("queue")) {
-	            useQueue = true;
-	        }
-	        else if (mode.equalsIgnoreCase("stack")) {
-	            useStack = true;
-	        }
-	        else if (mode.equalsIgnoreCase("opt")) {
-	            useOpt = true;
-	        } 
-	        else {
-	            System.out.println("Use queue or stack.");
+	        if (args.length == 0) {
+	            System.out.println("Missing input file.");
 	            System.exit(-1);
 	        }
 
-	        System.out.print("Show runtime? (yes/no): ");
-	        String timeChoice = input.nextLine();
+	        String fileName = args[args.length - 1];
 
-	        if (timeChoice.equalsIgnoreCase("yes")) {
-	            showTime = true;
+	        String[][][] maze;
+	        if (inCoordinate) {
+	            maze = getCords(fileName);
+	        } else {
+	            maze = getText(fileName);
 	        }
 
-	        System.out.print("Enter maze file name: ");
-	        fileName = input.nextLine();
-	    }
+	        long start = 0;
+	        long end = 0;
 
-	    System.out.print("Input format (text/coordinate): ");
-	    String inputType = input.nextLine();
-	    
-	    System.out.print("Output format (text/coordinate): ");
-	    String outputType = input.nextLine();
+	        if (showTime) start = System.nanoTime();
 
-	    String[][][] maze;
+	        Queue<int[]> path;
+	        if (useQueue) path = queueSearch(maze);
+	        else if (useStack) path = stackSearch(maze);
+	        else path = optSearch(maze);
 
-	    if (inputType.equalsIgnoreCase("text")) {
-	        maze = getText(fileName);
-	    }
-	    else if (inputType.equalsIgnoreCase("coordinate")) {
-	        maze = getCords(fileName);
-	    }
-	    else {
-	        System.out.println("Invalid input format.");
-	        return;
-	    }
-	    long startTime = 0;
-	    long endTime = 0;
+	        if (showTime) end = System.nanoTime();
 
-	    Queue<int[]> path;
+	        if (path.isEmpty()) {
+	            System.out.println("The Wolverine Store is closed.");
+	            return;
+	        }
 
-	    if (showTime) {
-	        startTime = System.nanoTime();
-	    }
+	        if (outCoordinate) {
+	            printPathCoordinates(path);
+	        } else {
+	            markPath(maze, path);
+	            displayGrid(maze);
+	        }
 
-	    if (useQueue) {
-	        path = queueSearch(maze);
-	    }
-	    else if (useStack) {
-	        path = stackSearch(maze);
-	    }
-	    else {
-	        path = optSearch(maze);
-	    }
+	        if (showTime) {
+	            double time = (end - start) / 1_000_000_000.0;
+	            System.out.println("Total Runtime: " + time + " seconds");
+	        }
 
-	    if (showTime) {
-	        endTime = System.nanoTime();
-	    }
-
-	    if (useQueue) {
-	        System.out.println("Queue Path:");
-	    }
-	    else if (useStack) {
-	        System.out.println("Stack Path:");
-	    }
-	    else {
-	        System.out.println("Optimal Path:");
-	    }
-	    
-	    if (path.isEmpty()) {
-	        System.out.println("The Wolverine Store is closed.");
-	        return;
-	    }
-
-	    if (outputType.equalsIgnoreCase("text")) {
-	        markPath(maze, path);
-	        displayGrid(maze);
-	    }
-	    else if (outputType.equalsIgnoreCase("coordinate")) {
-	        printPathCoordinates(path);
-	    }
-	    else {
-	        System.out.println("Invalid output format.");
-	        return;
-	    }
-
-	    if (showTime) {
-	        double totalSeconds = (endTime - startTime) / 1000000000.0;
-	        System.out.println("Total Runtime: " + totalSeconds + " seconds");
+	    } catch (Exception e) {
+	        System.out.println("Error: " + e.getMessage());
+	        System.exit(-1);
 	    }
 	}
     
@@ -500,15 +431,14 @@ public class Runner{
     }
     
     public static void printHelp() {
-        System.out.println("Overview: program finds viable path if possible from the Wolverine to the WolverineBuck. Using stack, queue, or optimal traversal. ");
-        System.out.println("--Stack : use stack-based traversal (DFS)");
-        System.out.println("--Queue : use queue-based traversal (BFS)");
-        System.out.println("--Opt : use shortest path");
-        System.out.println("--Time : print runtime");
-        System.out.println("--Incoordinate : input is coordinate format");
+        System.out.println("Maze Solver Program");
+        System.out.println("--Stack : use stack-based traversal");
+        System.out.println("--Queue : use queue-based traversal");
+        System.out.println("--Opt : use optimal shortest-path traversal");
+        System.out.println("--Time : print total runtime");
+        System.out.println("--Incoordinate : input file is coordinate format");
         System.out.println("--Outcoordinate : output path as coordinates");
         System.out.println("--Help : display this message");
-        System.out.println("--Opt : use optimal shortest-path search");
     }
     
     public static Queue<int[]> optSearch(String[][][] maze) {
