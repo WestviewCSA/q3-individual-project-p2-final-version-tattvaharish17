@@ -20,7 +20,7 @@ public class Runner{
 
 	    if (args.length > 0) {
 
-	        for (int i = 0; i < args.length - 1; i++) {
+	        for (int i = 0;i < args.length - 1; i++) {
 	            if (args[i].equals("--Queue")) {
 	                useQueue = true;
 	            }
@@ -68,6 +68,9 @@ public class Runner{
 
 	    System.out.print("Input format (text/coordinate): ");
 	    String inputType = input.nextLine();
+	    
+	    System.out.print("Output format (text/coordinate): ");
+	    String outputType = input.nextLine();
 
 	    String[][][] maze;
 
@@ -100,15 +103,23 @@ public class Runner{
 	        endTime = System.nanoTime();
 	    }
 
-	    markPath(maze, path);
-
 	    if (useQueue) {
 	        System.out.println("Queue Path:");
 	    } else {
 	        System.out.println("Stack Path:");
 	    }
 
-	    displayGrid(maze);
+	    if (outputType.equalsIgnoreCase("text")) {
+	        markPath(maze, path);
+	        displayGrid(maze);
+	    }
+	    else if (outputType.equalsIgnoreCase("coordinate")) {
+	        printPathCoordinates(path);
+	    }
+	    else {
+	        System.out.println("Invalid output format.");
+	        return;
+	    }
 
 	    if (showTime) {
 	        double totalSeconds = (endTime - startTime) / 1000000000.0;
@@ -442,6 +453,13 @@ public class Runner{
                 System.out.println();
             }
 
+        }
+    }
+    
+    public static void printPathCoordinates(Queue<int[]> path) {
+        while (!path.isEmpty()) {
+            int[] pos = path.poll();
+            System.out.println(pos[0] + " " + pos[1] + " " + pos[2]);
         }
     }
     
